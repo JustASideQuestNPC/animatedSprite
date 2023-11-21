@@ -6,18 +6,15 @@ PGraphics upscale;
 void setup() {
   size(300, 300);
   noSmooth();
-  upscale = createGraphics(60, 60);
+  upscale = createGraphics(30, 30);
   upscale.noSmooth();
   sprite = new AnimatedSprite("sprite")
-              .setPosition(30, 30)
-              .setImageMode(CENTER)
-              .setScale(2)
-              .restart();
+          .setPosition(15, 15)
+          .setImageMode(CENTER);
+  sprite.restart();
 }
 
 void draw() {
-  sprite.update();
-
   background(255);
   upscale.beginDraw();
   upscale.background(255);

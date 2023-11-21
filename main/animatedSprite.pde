@@ -2,12 +2,15 @@ import java.io.File;
 
 /* does basic animations by swapping out pngs */
 class AnimatedSprite {
+  // set to false to only update when update() is called)
+  final boolean AUTO_UPDATE_ON_RENDER = true;
+
   PImage[] frames;
   PImage currentFrame;
   long currentTime, nsPerFrame, frameTimer; // longs are just bigger ints, these need to be them for technical reasons
-  int frameIndex, numFrames, imgMode;
-  float framesPerSecond, playSpeed = 1;
-  float x, y, w, h, angle;
+  int frameIndex, numFrames, imageMode;
+  float frameRate, playSpeed = 1;
+  float x, y, xOffset, yOffset, width, height, angle;
   boolean paused = true, looping = true;
 
   /* ctor that takes an array of PImages directly */
@@ -37,33 +40,33 @@ class AnimatedSprite {
   }
 
   // overload that takes a PVector
-  AnimatedSprite setPosition(PVector pos) {
-    return setPosition(pos.x, pos.y);
+  AnimatedSprite setPosition(PVector position) {
+    return setPosition(position.x, position.y);
   }
 
-  AnimatedSprite setSize(float w, float h) {
-    this.w = w;
-    this.h = h;
+  AnimatedSprite setSize(float width, float height) {
+    this.width = width;
+    this.height = height;
     return this;
   }
 
   // multiplies width and height by a scalar
-  AnimatedSprite setScale(float s) {
-    return setSize(w * s, h * s);
+  AnimatedSprite setScale(float scalar) {
+    return setSize(this.width * scalar, this.height * scalar);
   }
 
   // either CORNER or CENTER (which are actually just 0 and 3); default is CORNER
-  AnimatedSprite setImageMode(int imgMode) throws IllegalArgumentException {
-    if (imgMode != CORNER && imgMode != CENTER) {
+  AnimatedSprite setImageMode(int imageMode) throws IllegalArgumentException {
+    if (imageMode != CORNER && imageMode != CENTER) {
       // setting ImageMode to CORNERS won't crash anything but it'll still cause things to break,
       // so we check it and throw an exception if we need to so that it doesn't cause problems down the
       // line (it also lets us give a nice description that went wrong)
       throw new IllegalArgumentException(
         String.format("Invalid image mode for AnimatedSprite.setImageMode()! (Expected 0 (CORNER) or " +
-                      "3 (CENTER), recieved %1$d)", imgMode)
+                      "3 (CENTER), recieved %1$d)", imageMode)
         );
     }
-    this.imgMode = imgMode;
+    this.imageMode = imageMode;
     return this;
   }
 
@@ -72,9 +75,22 @@ class AnimatedSprite {
     return this;
   }
 
-  AnimatedSprite setFrameRate(float framesPerSecond) {
-    this.framesPerSecond = framesPerSecond;
-    nsPerFrame = (long)((1 / framesPerSecond) * 1000000000); // time between frames in nanoseconds
+  AnimatedSprite setOffset(float x, float y) {
+    this.xOffset = x;
+    this.yOffset = y;
+    return this;
+  }
+
+  AnimatedSprite setOffset(PVector offset) {
+    return setOffset(offset.x, offset.y);
+  }
+
+  AnimatedSprite setFrameRate(float frameRate) throws IllegalArgumentException {
+    if (frameRate === 0) {
+      throw new IllegalArgumentException("AnimatedSprites cannot have a frame rate of 0 FPS!");
+    }
+    this.frameRate = frameRate;
+    nsPerFrame = (long)((1 / this.frameRate) * 1000000000); // time between frames in nanoseconds
     frameTimer = nsPerFrame;
     return this;
   }
@@ -125,10 +141,18 @@ class AnimatedSprite {
     return this;
   }
 
+  /* pauses and returns to the first or last frame based on play direction */
+  AnimatedSprite reset() {
+    if (playSpeed < 0) frameIndex = numFrames - 1;
+    else frameIndex = 0;
+    currentFrame = frames[frameIndex];
+    paused = true;
+    return this;
+  }
+
   /* starts playing at the first or last frame based on play direction */
   AnimatedSprite restart() {
-    frameIndex = 0;
-    currentFrame = frames[frameIndex];
+    reset();
     paused = false;
     return this;
   }
@@ -145,14 +169,15 @@ class AnimatedSprite {
     }
   }
 
-  /* renders the current frame to the given PGraphics canvas */
+  /* updates the sprite and renders the current frame to the given PGraphics canvas */
   void render(PGraphics pg) {
+    if (AUTO_UPDATE_ON_RENDER) update();
     pg.pushStyle();
-    pg.imageMode(imgMode);
+    pg.imageMode(this.imageMode);
     pg.pushMatrix();
     pg.translate(x, y);
     pg.rotate(angle);
-    pg.image(currentFrame, 0, 0, w, h);
+    pg.image(currentFrame, xOffset, yOffset, this.width, this.height);
     pg.popMatrix();
     pg.popStyle();
   }
@@ -168,12 +193,10 @@ class AnimatedSprite {
     if (numFrames == 0) throw new IllegalArgumentException("AnimatedSprite has no frames!");
     frameIndex = 0;
     currentFrame = frames[frameIndex];
-    w = currentFrame.width;
-    h = currentFrame.height;
-    // default frame rate is 10 fps
-    framesPerSecond = 10;
-    nsPerFrame = (long)((1 / framesPerSecond) * 1000000000); // time between frames in nanoseconds
-    frameTimer = nsPerFrame;
+    this.width = currentFrame.width;
+    this.height = currentFrame.height;
+    // default frame rate is 15 fps
+    setFrameRate(15);
     
     // start the clock used for tracking frames - System.nanoTime() is far more precise than millis()
     currentTime = System.nanoTime();
