@@ -1,5 +1,6 @@
 AnimatedSprite sprite;
 
+// sprite is drawn to a canvas and upscaled to make it large enough to see
 PGraphics upscale;
 
 void setup() {
@@ -23,4 +24,8 @@ void draw() {
   sprite.render(upscale);
   upscale.endDraw();
   image(upscale, 0, 0, width, height);
+}
+
+void mousePressed() {
+  sprite.playSpeed *= -1;
 }
