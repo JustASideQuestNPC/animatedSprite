@@ -1,5 +1,10 @@
 # AnimatedSprite
 A "header-only" Processing library that creates an animation from a group of PNG files.
+### Installation Guide
+- Download `AnimatedSprite.pde` from the [latest release](https://github.com/JustASideQuestNPC/animatedSprite/releases/tag/v1.0.0).
+- Drop it in your sketch folder with the rest of your code files.
+- Follow the Quickstart guide.
+- Profit.
 
 ### Contents
 - [Quickstart](#quickstart)
