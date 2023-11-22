@@ -63,7 +63,7 @@ AnimatedSprite sprite = new AnimatedSprite("sprite")
 ```
 
 # Fields
-### "Writable" fields - these are safe to set directly and will work as intended.
+### "Writable" fields - these are safe to set directly and will always work as intended if you do.
 - `x` (`float`) - The x coordinate of the sprite. Defaults to `0`.
 - `y` (`float`) - The y coordinate of the sprite. Defaults to `0`.
 - `width` (`float`) - The width of the sprite. Defaults to the width of the first frame.
