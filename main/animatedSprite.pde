@@ -2,9 +2,6 @@ import java.io.File;
 
 /* does basic animations by swapping out pngs */
 class AnimatedSprite {
-  // set to false to only update when update() is called)
-  final boolean AUTO_UPDATE_ON_RENDER = true;
-
   PImage[] frames;
   PImage currentFrame;
   long currentTime, nsPerFrame, frameTimer; // longs are just bigger ints, these need to be them for technical reasons
@@ -86,7 +83,7 @@ class AnimatedSprite {
   }
 
   AnimatedSprite setFrameRate(float frameRate) throws IllegalArgumentException {
-    if (frameRate === 0) {
+    if (frameRate == 0) {
       throw new IllegalArgumentException("AnimatedSprites cannot have a frame rate of 0 FPS!");
     }
     this.frameRate = frameRate;
@@ -111,10 +108,7 @@ class AnimatedSprite {
     this.frameIndex = frameIndex;
     return this;
   }
-  AnimatedSprite setPlaySpeed(float playSpeed) throws IllegalArgumentException {
-    if (playSpeed == 0) {
-      throw new IllegalArgumentException("AnimatedSprites cannot have a play speed of 0!");
-    }
+  AnimatedSprite setPlaySpeed(float playSpeed) {
     this.playSpeed = playSpeed;
     return this;
   }
@@ -171,7 +165,7 @@ class AnimatedSprite {
 
   /* updates the sprite and renders the current frame to the given PGraphics canvas */
   void render(PGraphics pg) {
-    if (AUTO_UPDATE_ON_RENDER) update();
+    update();
     pg.pushStyle();
     pg.imageMode(this.imageMode);
     pg.pushMatrix();
